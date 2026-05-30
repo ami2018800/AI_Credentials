@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credential Intelligence // Emerging Tech Workforce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c0a07; --paper:#f4efe6; --paper2:#ece4d6; --line:#2a2620;
+  --hi:#d6452b; --hi2:#1c5d4f; --gold:#b8893a; --mute:#6b6356;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:"Space Mono",monospace;
+  background-image:radial-gradient(var(--paper2) 1px,transparent 1px);background-size:18px 18px;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px}
+
+/* MASTHEAD */
+header{border-bottom:3px solid var(--ink);padding:26px 0 18px;position:relative}
+.kick{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--hi);font-weight:700}
+h1{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(34px,6vw,68px);line-height:.92;
+  letter-spacing:-.02em;margin:8px 0 6px}
+.sub{font-size:13px;color:var(--mute);max-width:640px;line-height:1.5}
+.meta{position:absolute;right:22px;top:30px;text-align:right;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--mute);line-height:1.9}
+.meta b{color:var(--hi2);font-weight:700}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--hi2);
+  margin-right:5px;animation:pulse 2s infinite}
+.dot.paused{background:var(--gold);animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* PULL NOW BUTTON */
+.pull-btn{display:inline-flex;align-items:center;gap:8px;background:var(--hi);color:#fff;
+  border:none;font-family:inherit;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  font-weight:700;padding:10px 18px;cursor:pointer;transition:.15s;white-space:nowrap}
+.pull-btn:hover{background:#b83520}
+.pull-btn:disabled{background:#c9a87a;cursor:not-allowed}
+.pull-btn svg{width:14px;height:14px;flex-shrink:0}
+.pull-status{font-size:11px;color:var(--hi2);font-weight:700;letter-spacing:.08em;
+  display:none;align-items:center;gap:6px}
+.pull-status.visible{display:flex}
+.pull-status.error{color:var(--hi)}
+
+/* SOURCE MANAGER */
+.src-section{border-top:3px solid var(--ink);padding:48px 0 56px}
+.src-section h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(26px,4vw,42px);
+  letter-spacing:-.01em;margin-bottom:6px}
+.src-intro{font-size:12px;color:var(--mute);margin-bottom:28px;line-height:1.5}
+.src-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line)}
+@media(max-width:860px){.src-layout{grid-template-columns:1fr}}
+.src-panel{padding:24px}
+.src-panel+.src-panel{border-left:1px solid var(--line)}
+.src-panel-title{font-size:10px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;
+  margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.src-panel-title .ct{color:var(--hi);font-size:9px}
+.src-add-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.src-add-row input{flex:1;min-width:160px;padding:10px 11px;border:1px solid var(--line);
+  background:var(--paper);font-family:inherit;font-size:12px;color:var(--ink)}
+.src-add-row input:focus{outline:none;border-color:var(--hi);box-shadow:3px 3px 0 var(--hi)}
+.src-add-row select{padding:10px 8px;border:1px solid var(--line);background:var(--paper);
+  font-family:inherit;font-size:11px;color:var(--ink)}
+.src-add-btn{padding:10px 16px;background:var(--hi2);color:#fff;border:none;font-family:inherit;
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap}
+.src-add-btn:hover{background:#164a3e}
+.src-list{display:flex;flex-direction:column;gap:0;max-height:340px;overflow-y:auto}
+.src-list::-webkit-scrollbar{width:4px}.src-list::-webkit-scrollbar-thumb{background:var(--line)}
+.src-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;
+  border-bottom:1px dashed var(--line);animation:rise .3s both}
+.src-item:last-child{border-bottom:none}
+.src-item-info{flex:1;min-width:0}
+.src-item-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src-item-url{font-size:10px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src-item-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.src-chip{font-size:9px;padding:1px 6px;background:var(--paper2);border:1px solid #d8cfbf;color:#4a4338}
+.src-chip.gov{background:#dff0e8;border-color:#a8d4bc;color:#1c5d4f}
+.src-chip.new{background:#fde8e4;border-color:#f5b8ae;color:var(--hi)}
+.src-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.src-pull-one{font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  background:none;border:1px solid var(--hi);color:var(--hi);padding:4px 8px;cursor:pointer;font-family:inherit}
+.src-pull-one:hover{background:var(--hi);color:#fff}
+.src-remove{font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:1px solid var(--line);color:var(--mute);padding:4px 8px;cursor:pointer;font-family:inherit}
+.src-remove:hover{background:var(--line);color:var(--paper)}
+.src-empty{font-size:12px;color:var(--mute);padding:20px 0;text-align:center}
+.rec-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.rec-item:last-child{border-bottom:none}
+.rec-info{flex:1;min-width:0}
+.rec-name{font-size:12px;font-weight:700}
+.rec-url{font-size:10px;color:var(--mute)}
+.rec-why{font-size:10px;color:var(--hi2);margin-top:3px;line-height:1.4}
+.rec-add-btn{font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  background:none;border:1px solid var(--hi2);color:var(--hi2);padding:4px 8px;cursor:pointer;
+  font-family:inherit;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.rec-add-btn:hover{background:var(--hi2);color:#fff}
+.rec-add-btn.added{background:var(--paper2);border-color:var(--line);color:var(--mute);cursor:default}
+.src-msg{font-size:10px;color:var(--hi2);font-weight:700;letter-spacing:.08em;
+  min-height:16px;margin-top:6px}
+
+/* FAQ */
+.faq-section{border-top:3px solid var(--ink);padding:48px 0 60px}
+.faq-section h2{font-family:"Fraunces",serif;font-weight:900;font-size:clamp(26px,4vw,42px);
+  letter-spacing:-.01em;margin-bottom:6px}
+.faq-intro{font-size:12px;color:var(--mute);margin-bottom:32px;line-height:1.5}
+.faq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:0;
+  border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.faq-item{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.faq-q{width:100%;background:none;border:none;font-family:inherit;text-align:left;
+  padding:16px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;
+  gap:12px;font-size:13px;font-weight:700;color:var(--ink);line-height:1.3}
+.faq-q:hover{background:var(--paper2)}
+.faq-q .arr{font-size:16px;color:var(--hi);flex-shrink:0;transition:.2s;margin-top:1px}
+.faq-q[aria-expanded=true] .arr{transform:rotate(180deg)}
+.faq-a{font-size:12px;line-height:1.65;color:#403a30;padding:0 18px 16px;display:none}
+.faq-a.open{display:block}
+.faq-ask{border-top:1px solid var(--line);padding:32px 0 0;display:flex;flex-direction:column;gap:10px}
+.faq-ask label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--mute)}
+.faq-ask-row{display:flex;gap:10px;flex-wrap:wrap}
+.faq-ask input{flex:1;min-width:200px;padding:11px 12px;border:1px solid var(--line);
+  background:var(--paper);font-family:inherit;font-size:13px;color:var(--ink)}
+.faq-ask input:focus{outline:none;border-color:var(--hi);box-shadow:3px 3px 0 var(--hi)}
+.faq-ask button{padding:11px 20px;background:var(--ink);color:var(--paper);border:none;
+  font-family:inherit;font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;cursor:pointer}
+.faq-ask button:hover{background:var(--hi)}
+.faq-answer-box{background:var(--ink);color:var(--paper);padding:16px 18px;font-size:12px;
+  line-height:1.6;display:none;margin-top:4px}
+.faq-answer-box.visible{display:block}
+
+/* STAT STRIP */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);
+  background:var(--ink);color:var(--paper)}
+.stat{padding:16px 18px;border-right:1px solid #33302a}
+.stat:last-child{border-right:none}
+.stat .n{font-family:"Fraunces",serif;font-size:30px;font-weight:600;line-height:1}
+.stat .l{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#a59c8c;margin-top:5px}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:248px 1fr;gap:0;align-items:start}
+aside{border-right:1px solid var(--line);padding:24px 22px 60px;position:sticky;top:0;
+  max-height:100vh;overflow-y:auto}
+aside::-webkit-scrollbar{width:5px}aside::-webkit-scrollbar-thumb{background:var(--line)}
+.fgrp{margin-bottom:22px}
+.flab{font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;
+  margin-bottom:9px;display:flex;justify-content:space-between;align-items:center}
+.flab .ct{color:var(--hi);font-size:9px}
+.opt{display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer;color:#3a352c}
+.opt:hover{color:var(--hi)}
+.opt input{accent-color:var(--hi);width:13px;height:13px;cursor:pointer}
+.opt .c{margin-left:auto;font-size:10px;color:var(--mute)}
+input[type=range]{width:100%;accent-color:var(--hi);margin-top:6px}
+.rngval{font-size:11px;color:var(--hi2);font-weight:700;margin-top:3px}
+.reset{font-size:10px;letter-spacing:.15em;text-transform:uppercase;background:none;border:1px solid var(--line);
+  color:var(--ink);padding:8px 12px;cursor:pointer;width:100%;font-family:inherit;transition:.15s}
+.reset:hover{background:var(--ink);color:var(--paper)}
+
+main{padding:24px 22px 80px;min-width:0}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;padding:11px 12px 11px 34px;border:1px solid var(--line);background:var(--paper);
+  font-family:inherit;font-size:13px;color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--hi);box-shadow:3px 3px 0 var(--hi)}
+.search::before{content:"⌕";position:absolute;left:11px;top:9px;font-size:17px;color:var(--mute)}
+select{padding:11px 10px;border:1px solid var(--line);background:var(--paper);font-family:inherit;
+  font-size:12px;color:var(--ink);cursor:pointer}
+.count{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:14px}
+.count b{color:var(--hi)}
+
+/* CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:0;
+  border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.card{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px;
+  background:var(--paper);position:relative;transition:.18s;animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card:hover{background:#fff;z-index:2}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px}
+.tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;padding:3px 7px;
+  border:1px solid var(--ink);white-space:nowrap}
+.tag.ind{background:var(--ink);color:var(--paper)}
+.sig{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;font-weight:700}
+.sig.high{background:var(--hi);color:#fff}.sig.medium{background:var(--gold);color:#fff}
+.sig.low{background:#bdb5a5;color:var(--ink)}
+.card h3{font-family:"Fraunces",serif;font-size:21px;font-weight:600;line-height:1.05;margin:4px 0 3px}
+.org{font-size:11px;color:var(--hi2);font-weight:700;letter-spacing:.04em;margin-bottom:10px}
+.desc{font-size:12px;line-height:1.5;color:#403a30;margin-bottom:12px}
+.skills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px}
+.skill{font-size:10px;background:var(--paper2);padding:2px 7px;color:#4a4338;border:1px solid #d8cfbf}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:11px;
+  border-top:1px dashed var(--line);padding-top:11px;margin-bottom:13px}
+.facts div span{color:var(--mute);text-transform:uppercase;font-size:9px;letter-spacing:.1em;display:block}
+.facts div b{font-weight:700}
+.cost-free{color:var(--hi2)}
+.go{display:flex;justify-content:space-between;align-items:center}
+.go a{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink);
+  text-decoration:none;border-bottom:2px solid var(--hi);padding-bottom:1px}
+.go a:hover{color:var(--hi)}
+.upd{font-size:10px;color:var(--mute)}
+.empty{padding:60px 20px;text-align:center;color:var(--mute);grid-column:1/-1;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+footer{border-top:3px solid var(--ink);padding:20px 0;font-size:10px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media(max-width:860px){.layout{grid-template-columns:1fr}aside{position:static;max-height:none;border-right:none;border-bottom:1px solid var(--line)}.stats{grid-template-columns:repeat(2,1fr)}.meta{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="kick"><span class="dot paused"></span>Emerging Technology Workforce Intelligence</div>
+  <h1>Credential<br>Intelligence</h1>
+  <p class="sub">A continuously updated index of certifications, microcredentials, and industry training preparing the workforce for AI, robotics, cybersecurity, and the jobs ahead.</p>
+  <div class="meta">Crawl cadence <b>Manual</b><br>Last refresh <b id="lastref">—</b><br>Scheduler <b style="color:var(--gold)">Paused</b></div>
+</div></header>
+
+<div class="stats" id="stats"></div>
+
+<div class="wrap"><div class="layout">
+  <aside id="filters"></aside>
+  <main>
+    <div class="toolbar">
+      <div class="search"><input id="q" placeholder="Search credentials, skills, organizations…" autocomplete="off"></div>
+      <select id="sort">
+        <option value="recent">Sort: Recently updated</option>
+        <option value="demand">Sort: Demand signal</option>
+        <option value="costlo">Sort: Cost (low→high)</option>
+        <option value="costhi">Sort: Cost (high→low)</option>
+        <option value="az">Sort: Name (A→Z)</option>
+      </select>
+      <button class="pull-btn" id="pullBtn" onclick="triggerPull()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M4 9a8 8 0 0 1 14.93-2M20 15a8 8 0 0 1-14.93 2"/></svg>
+        Pull Data NOW
+      </button>
+    </div>
+    <div class="pull-status" id="pullStatus"></div>
+    <div class="count" id="count"></div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div></div>
+
+<section class="src-section"><div class="wrap">
+  <div class="kick" style="margin-bottom:8px">Data Pipeline</div>
+  <h2>Source Manager</h2>
+  <p class="src-intro">Add any URL as a data source. Sources are crawled on every "Pull Data NOW" run and included in future scheduled pulls. Recommended sources are pre-vetted for credential data quality.</p>
+  <div class="src-layout">
+    <!-- LEFT: active sources -->
+    <div class="src-panel">
+      <div class="src-panel-title">Active Sources <span class="ct" id="srcCount">0</span></div>
+      <div class="src-add-row">
+        <input type="text" id="srcUrl" placeholder="https://www.bls.gov/ooh/" />
+        <input type="text" id="srcName" placeholder="Label (e.g. BLS OOH)" />
+        <select id="srcCat">
+          <option value="Labor / Gov">Labor / Gov</option>
+          <option value="Certification Body">Certification Body</option>
+          <option value="University / College">University / College</option>
+          <option value="Training Platform">Training Platform</option>
+          <option value="Workforce Board">Workforce Board</option>
+          <option value="Industry Assoc.">Industry Assoc.</option>
+          <option value="Other">Other</option>
+        </select>
+        <button class="src-add-btn" onclick="addSource()">+ Add</button>
+      </div>
+      <div class="src-msg" id="srcMsg"></div>
+      <div class="src-list" id="srcList"><div class="src-empty">No sources added yet. Add one above or use a recommendation →</div></div>
+    </div>
+    <!-- RIGHT: recommendations -->
+    <div class="src-panel">
+      <div class="src-panel-title">Recommended Sources <span class="ct" id="recCount">20</span></div>
+      <div class="src-list" id="recList"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="faq-section"><div class="wrap">
+  <div class="kick" style="margin-bottom:8px">User Guide</div>
+  <h2>FAQ &amp; Help</h2>
+  <p class="faq-intro">Everything you need to know about using this dashboard and how the data is gathered and scored.</p>
+
+  <div class="faq-grid" id="faqGrid"></div>
+
+  <div class="faq-ask">
+    <label>Ask a question about the dashboard or data</label>
+    <div class="faq-ask-row">
+      <input type="text" id="faqAskInput" placeholder="e.g. Why is a credential marked low demand?" />
+      <button onclick="answerQuestion()">Ask</button>
+    </div>
+    <div class="faq-answer-box" id="faqAnswerBox"></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between;width:100%;flex-wrap:wrap;gap:8px">
+  <span>Credential Intelligence Agent · Prototype</span>
+  <span>Scope: US primary / Intl secondary · English primary</span>
+  <span id="rec">—</span>
+</div></footer>
+
+<script>
+window.CREDENTIALS=[{"id":"aws-mle","name":"AWS Certified Machine Learning Engineer – Associate","org":"Amazon Web Services","type":"Certification","industry":"AI","skills":["Machine Learning","Model Deployment","MLOps","AWS SageMaker","Data Engineering"],"desc":"Validates ability to build, operationalize, and maintain ML solutions on AWS, including data prep, model training, deployment and monitoring.","cost":150,"duration":"~3 months prep","format":"Online proctored exam","region":"Global","lang":["English","Japanese","Korean"],"url":"https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/","occ":["ML Engineer","Data Scientist","MLOps Engineer"],"updated":"2025-08-12","signal":"high"},{"id":"google-pmle","name":"Professional Machine Learning Engineer","org":"Google Cloud","type":"Certification","industry":"AI","skills":["ML Pipeline Design","Vertex AI","Responsible AI","Model Monitoring","TensorFlow"],"desc":"Certifies design and productionization of ML models using Google Cloud, with emphasis on scalability and responsible AI.","cost":200,"duration":"~4 months prep","format":"Online proctored exam","region":"Global","lang":["English","Japanese"],"url":"https://cloud.google.com/learn/certification/machine-learning-engineer","occ":["ML Engineer","AI Engineer"],"updated":"2025-10-02","signal":"high"},{"id":"comptia-sec","name":"CompTIA Security+","org":"CompTIA","type":"Certification","industry":"Cybersecurity","skills":["Network Security","Threat Management","Cryptography","Incident Response","Risk Management"],"desc":"Vendor-neutral baseline certification covering core security functions; DoD 8570 approved and widely required for entry security roles.","cost":404,"duration":"~2 months prep","format":"Online or in-person exam","region":"Global","lang":["English","Japanese","German","Portuguese"],"url":"https://www.comptia.org/certifications/security","occ":["Security Analyst","SOC Analyst","Systems Administrator"],"updated":"2026-01-15","signal":"high"},{"id":"isc2-cc","name":"Certified in Cybersecurity (CC)","org":"ISC2","type":"Certification","industry":"Cybersecurity","skills":["Security Principles","Access Control","Network Security","Security Operations"],"desc":"Entry-level certification for those starting a cybersecurity career; exam and training free under ISC2 One Million Certified in Cybersecurity initiative.","cost":0,"duration":"~1 month prep","format":"Online proctored exam","region":"Global","lang":["English","Spanish","Japanese","Chinese"],"url":"https://www.isc2.org/certifications/cc","occ":["Junior Security Analyst","IT Support Specialist"],"updated":"2025-11-20","signal":"high"},{"id":"ibm-ds","name":"IBM Data Science Professional Certificate","org":"IBM (via Coursera)","type":"Certificate","industry":"Data Science","skills":["Python","SQL","Data Visualization","Machine Learning","Pandas"],"desc":"Beginner-friendly program covering the full data science workflow with hands-on labs; no prior experience required.","cost":59,"duration":"~4 months (10 hrs/wk)","format":"Self-paced online","region":"Global","lang":["English","Arabic","Spanish"],"url":"https://www.coursera.org/professional-certificates/ibm-data-science","occ":["Data Analyst","Junior Data Scientist"],"updated":"2025-09-30","signal":"medium"},{"id":"azure-data","name":"Microsoft Certified: Azure Data Scientist Associate","org":"Microsoft","type":"Certification","industry":"Data Science","skills":["Azure ML","Model Training","MLflow","Responsible AI","Python"],"desc":"Validates applying data science and ML on Azure to run experiments, train models, and deploy solutions.","cost":165,"duration":"~2 months prep","format":"Online proctored exam","region":"Global","lang":["English","Japanese","Chinese","Korean"],"url":"https://learn.microsoft.com/credentials/certifications/azure-data-scientist/","occ":["Data Scientist","ML Engineer"],"updated":"2026-02-01","signal":"medium"},{"id":"aws-saa","name":"AWS Certified Solutions Architect – Associate","org":"Amazon Web Services","type":"Certification","industry":"Cloud Computing","skills":["Cloud Architecture","High Availability","Cost Optimization","Security","Networking"],"desc":"Most popular cloud cert; validates designing distributed, resilient systems on AWS.","cost":150,"duration":"~3 months prep","format":"Online proctored exam","region":"Global","lang":["English","Japanese","Korean","Chinese"],"url":"https://aws.amazon.com/certification/certified-solutions-architect-associate/","occ":["Cloud Engineer","Solutions Architect","DevOps Engineer"],"updated":"2025-12-10","signal":"high"},{"id":"cka","name":"Certified Kubernetes Administrator (CKA)","org":"Cloud Native Computing Foundation","type":"Certification","industry":"Cloud Computing","skills":["Kubernetes","Container Orchestration","Cluster Networking","Troubleshooting"],"desc":"Hands-on performance-based exam validating ability to administer Kubernetes clusters in production.","cost":445,"duration":"~2 months prep","format":"Online proctored, performance-based","region":"Global","lang":["English"],"url":"https://www.cncf.io/training/certification/cka/","occ":["DevOps Engineer","Platform Engineer","SRE"],"updated":"2026-01-08","signal":"high"},{"id":"fanuc-robot","name":"FANUC Certified Robot Operator","org":"FANUC America","type":"Industry Credential","industry":"Robotics","skills":["Robot Programming","Teach Pendant Operation","Safety Systems","Automation Cells"],"desc":"Industry-recognized credential for operating and programming FANUC industrial robots, delivered via certified education partners.","cost":1200,"duration":"40 hours","format":"In-person / hybrid","region":"United States","lang":["English"],"url":"https://www.fanucamerica.com/education/certified-education-robot-training","occ":["Robotics Technician","Automation Technician","Manufacturing Engineer"],"updated":"2025-07-18","signal":"medium"},{"id":"siemens-mecha","name":"Siemens Mechatronic Systems Certification (SMSCP)","org":"Siemens","type":"Industry Credential","industry":"Automation","skills":["Mechatronics","PLC Programming","Industrial Maintenance","Process Control"],"desc":"Globally portable, industry-driven credential validating mechatronics competencies for advanced manufacturing.","cost":850,"duration":"Varies by level","format":"In-person at partner colleges","region":"United States","lang":["English","German"],"url":"https://www.siemens.com/us/en/company/education/scc.html","occ":["Maintenance Technician","Automation Engineer"],"updated":"2025-06-25","signal":"medium"},{"id":"chainlink-dev","name":"Chainlink Developer Bootcamp Certificate","org":"Chainlink Labs","type":"Certificate","industry":"Blockchain/Web3","skills":["Smart Contracts","Solidity","Oracles","Web3","Decentralized Apps"],"desc":"Free cohort-based bootcamp teaching smart contract and decentralized app development with verifiable completion badge.","cost":0,"duration":"4 weeks","format":"Online cohort","region":"Global","lang":["English"],"url":"https://chain.link/bootcamp","occ":["Blockchain Developer","Smart Contract Engineer"],"updated":"2025-10-14","signal":"medium"},{"id":"consensys-blockchain","name":"ConsenSys Blockchain Developer Certificate","org":"ConsenSys Academy","type":"Certificate","industry":"Blockchain/Web3","skills":["Ethereum","Solidity","dApp Architecture","Security","Web3.js"],"desc":"Professional certificate program covering Ethereum development from fundamentals to deployable dApps.","cost":1199,"duration":"~10 weeks","format":"Online self-paced","region":"Global","lang":["English"],"url":"https://consensys.io/academy","occ":["Blockchain Developer","Solidity Engineer"],"updated":"2025-05-09","signal":"low"},{"id":"google-da","name":"Google Data Analytics Professional Certificate","org":"Google (via Coursera)","type":"Certificate","industry":"Digital Skills","skills":["Spreadsheets","SQL","Tableau","R","Data Cleaning"],"desc":"Entry-level certificate preparing learners for data analyst roles with no degree or experience required; ACE-recommended for college credit.","cost":49,"duration":"~6 months (10 hrs/wk)","format":"Self-paced online","region":"Global","lang":["English","Spanish"],"url":"https://www.coursera.org/professional-certificates/google-data-analytics","occ":["Data Analyst","Business Analyst"],"updated":"2026-02-20","signal":"high"},{"id":"ai-essentials","name":"Google AI Essentials","org":"Google (via Coursera)","type":"Microcredential","industry":"AI","skills":["Generative AI","Prompt Engineering","AI Productivity","Responsible AI"],"desc":"Short self-paced course teaching practical use of generative AI tools for everyday work; no experience required.","cost":49,"duration":"~10 hours","format":"Self-paced online","region":"Global","lang":["English"],"url":"https://www.coursera.org/learn/google-ai-essentials","occ":["Any knowledge worker","Marketing Specialist"],"updated":"2026-03-01","signal":"high"},{"id":"ibm-ai-fund","name":"IBM AI Fundamentals (Skills Build)","org":"IBM SkillsBuild","type":"Digital Badge","industry":"AI","skills":["AI Concepts","Machine Learning Basics","NLP","Computer Vision","AI Ethics"],"desc":"Free badge program introducing AI concepts and real-world applications, aimed at students and career changers.","cost":0,"duration":"~10 hours","format":"Self-paced online","region":"Global","lang":["English","Spanish","French"],"url":"https://skillsbuild.org","occ":["Student","Career Changer"],"updated":"2025-11-05","signal":"medium"},{"id":"automation-anywhere","name":"Automation Anywhere Certified Essentials RPA Professional","org":"Automation Anywhere","type":"Certification","industry":"Automation","skills":["RPA","Bot Development","Process Automation","Automation 360"],"desc":"Validates foundational skills in building and managing software bots for robotic process automation.","cost":0,"duration":"~3 weeks prep","format":"Online proctored exam","region":"Global","lang":["English","Japanese"],"url":"https://www.automationanywhere.com/university/certifications","occ":["RPA Developer","Automation Analyst"],"updated":"2025-09-12","signal":"medium"},{"id":"isc2-cissp","name":"CISSP","org":"ISC2","type":"Certification","industry":"Cybersecurity","skills":["Security Architecture","Risk Management","IAM","Security Operations","Software Security"],"desc":"Advanced certification for experienced security professionals; requires 5 years experience and validates broad security leadership knowledge.","cost":749,"duration":"~6 months prep","format":"Online proctored exam","region":"Global","lang":["English","Japanese","Chinese","German","Spanish"],"url":"https://www.isc2.org/certifications/cissp","occ":["Security Manager","Security Architect","CISO"],"updated":"2026-01-22","signal":"high"},{"id":"databricks-de","name":"Databricks Certified Data Engineer Associate","org":"Databricks","type":"Certification","industry":"Data Science","skills":["Spark","Delta Lake","ETL","Lakehouse","Python"],"desc":"Validates ability to use the Databricks Lakehouse Platform for foundational data engineering tasks.","cost":200,"duration":"~2 months prep","format":"Online proctored exam","region":"Global","lang":["English"],"url":"https://www.databricks.com/learn/certification/data-engineer-associate","occ":["Data Engineer","Analytics Engineer"],"updated":"2025-12-18","signal":"high"},{"id":"ur-academy","name":"Universal Robots Core Track Certificate","org":"Universal Robots","type":"Microcredential","industry":"Robotics","skills":["Collaborative Robots","Cobot Programming","Safety Setup","Application Building"],"desc":"Free online training track on programming and deploying collaborative robots (cobots), with completion certificate.","cost":0,"duration":"~10 hours","format":"Online self-paced","region":"Global","lang":["English","German","Spanish","Chinese"],"url":"https://www.universal-robots.com/academy/","occ":["Robotics Technician","Automation Specialist"],"updated":"2025-08-29","signal":"medium"},{"id":"nvidia-dli-genai","name":"NVIDIA DLI: Generative AI with Diffusion Models","org":"NVIDIA Deep Learning Institute","type":"Digital Badge","industry":"AI","skills":["Generative AI","Diffusion Models","PyTorch","Deep Learning"],"desc":"Hands-on workshop with a certificate of competency in building generative AI models using diffusion techniques.","cost":90,"duration":"8 hours","format":"Online instructor-led or self-paced","region":"Global","lang":["English"],"url":"https://www.nvidia.com/en-us/training/","occ":["ML Engineer","AI Researcher"],"updated":"2026-02-14","signal":"high"}];
+const D=window.CREDENTIALS;
+const F={industry:new Set(),type:new Set(),format:new Set(),signal:new Set(),region:new Set(),maxCost:Infinity,q:""};
+const facet=k=>{const m={};D.forEach(c=>m[c[k]]=(m[c[k]]||0)+1);return Object.entries(m).sort((a,b)=>b[1]-a[1])};
+const maxC=Math.max(...D.map(c=>c.cost));
+
+function buildFilters(){
+  const blocks=[
+    ['Industry','industry',facet('industry')],
+    ['Credential Type','type',facet('type')],
+    ['Delivery Format','format',facet('format')],
+    ['Demand Signal','signal',[['high',0],['medium',0],['low',0]].map(([k])=>[k,D.filter(c=>c.signal===k).length])],
+    ['Region','region',facet('region')],
+  ];
+  let h='';
+  blocks.forEach(([label,key,items])=>{
+    h+=`<div class="fgrp"><div class="flab">${label}<span class="ct">${items.length}</span></div>`;
+    items.forEach(([v,c])=>{h+=`<label class="opt"><input type="checkbox" data-k="${key}" value="${v}">${v}<span class="c">${c}</span></label>`});
+    h+='</div>';
+  });
+  h+=`<div class="fgrp"><div class="flab">Max Cost (USD)</div>
+    <input type="range" id="cost" min="0" max="${maxC}" value="${maxC}" step="50">
+    <div class="rngval" id="costv">Any cost</div></div>
+    <button class="reset" id="reset">Reset all filters</button>`;
+  document.getElementById('filters').innerHTML=h;
+  document.querySelectorAll('aside input[type=checkbox]').forEach(cb=>cb.onchange=()=>{
+    const s=F[cb.dataset.k];cb.checked?s.add(cb.value):s.delete(cb.value);render();
+  });
+  const cost=document.getElementById('cost');
+  cost.oninput=()=>{F.maxCost=+cost.value>=maxC?Infinity:+cost.value;
+    document.getElementById('costv').textContent=F.maxCost===Infinity?'Any cost':'≤ $'+F.maxCost;render()};
+  document.getElementById('reset').onclick=()=>{
+    ['industry','type','format','signal','region'].forEach(k=>F[k].clear());
+    F.maxCost=Infinity;F.q="";document.getElementById('q').value="";
+    cost.value=maxC;document.getElementById('costv').textContent='Any cost';
+    document.querySelectorAll('aside input[type=checkbox]').forEach(c=>c.checked=false);render();
+  };
+}
+function setMatch(c){
+  if(F.industry.size&&!F.industry.has(c.industry))return false;
+  if(F.type.size&&!F.type.has(c.type))return false;
+  if(F.format.size&&!F.format.has(c.format))return false;
+  if(F.signal.size&&!F.signal.has(c.signal))return false;
+  if(F.region.size&&!F.region.has(c.region))return false;
+  if(c.cost>F.maxCost)return false;
+  if(F.q){const t=(c.name+c.org+c.desc+c.skills.join(" ")+c.occ.join(" ")+c.industry).toLowerCase();
+    if(!t.includes(F.q.toLowerCase()))return false;}
+  return true;
+}
+function sortRows(rows){
+  const s=document.getElementById('sort').value;const r={high:3,medium:2,low:1};
+  return rows.sort((a,b)=>{
+    if(s==='recent')return b.updated.localeCompare(a.updated);
+    if(s==='demand')return r[b.signal]-r[a.signal]||b.updated.localeCompare(a.updated);
+    if(s==='costlo')return a.cost-b.cost;
+    if(s==='costhi')return b.cost-a.cost;
+    if(s==='az')return a.name.localeCompare(b.name);
+  });
+}
+function render(){
+  let rows=sortRows(D.filter(setMatch));
+  document.getElementById('count').innerHTML=`Showing <b>${rows.length}</b> of ${D.length} indexed credentials`;
+  const g=document.getElementById('grid');
+  if(!rows.length){g.innerHTML='<div class="empty">No credentials match these filters.<br>Try widening your criteria.</div>';return;}
+  g.innerHTML=rows.map((c,i)=>`<article class="card" style="animation-delay:${Math.min(i*22,300)}ms">
+    <div class="top"><span class="tag ind">${c.industry}</span><span class="sig ${c.signal}">${c.signal} demand</span></div>
+    <span class="tag">${c.type}</span>
+    <h3>${c.name}</h3><div class="org">${c.org}</div>
+    <p class="desc">${c.desc}</p>
+    <div class="skills">${c.skills.map(s=>`<span class="skill">${s}</span>`).join('')}</div>
+    <div class="facts">
+      <div><span>Cost</span><b class="${c.cost===0?'cost-free':''}">${c.cost===0?'Free':'$'+c.cost}</b></div>
+      <div><span>Duration</span><b>${c.duration}</b></div>
+      <div><span>Format</span><b>${c.format}</b></div>
+      <div><span>Region</span><b>${c.region}</b></div>
+      <div style="grid-column:1/-1"><span>Related roles</span><b>${c.occ.join(', ')}</b></div>
+    </div>
+    <div class="go"><a href="${c.url}" target="_blank" rel="noopener">View credential ↗</a>
+      <span class="upd">upd ${c.updated}</span></div>
+  </article>`).join('');
+}
+function buildStats(){
+  const free=D.filter(c=>c.cost===0).length;
+  const inds=new Set(D.map(c=>c.industry)).size;
+  const hi=D.filter(c=>c.signal==='high').length;
+  document.getElementById('stats').innerHTML=[
+    [D.length,'Credentials indexed'],[inds,'Tech fields covered'],
+    [hi,'High-demand signals'],[free,'No-cost options']
+  ].map(([n,l])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  const latest=D.map(c=>c.updated).sort().reverse()[0];
+  document.getElementById('lastref').textContent=latest;
+  document.getElementById('rec').textContent='Most recent record: '+latest;
+}
+document.getElementById('q').oninput=e=>{F.q=e.target.value;render()};
+document.getElementById('sort').onchange=render;
+buildStats();buildFilters();render();
+
+/* ── PULL DATA NOW ── */
+function triggerPull(){
+  const btn=document.getElementById('pullBtn');
+  const st=document.getElementById('pullStatus');
+  btn.disabled=true;btn.textContent='Pulling…';
+  st.className='pull-status visible';
+  st.textContent='⟳ Connecting to agent pipeline…';
+  // Simulate stages (replace with real API call to your agent endpoint)
+  const steps=['⟳ Fetching seed sources…','⟳ Checking content hashes…','⟳ Extracting changed records…','⟳ Classifying & tagging…','✓ Data pull complete — refresh the page to see updates.'];
+  let i=0;
+  const iv=setInterval(()=>{
+    st.textContent=steps[i++];
+    if(i>=steps.length){
+      clearInterval(iv);
+      st.className='pull-status visible';
+      btn.disabled=false;
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4v5h5"/><path d="M20 20v-5h-5"/><path d="M4 9a8 8 0 0 1 14.93-2M20 15a8 8 0 0 1-14.93 2"/></svg> Pull Data NOW';
+    }
+  },900);
+}
+
+/* ── SOURCE MANAGER ── */
+const RECOMMENDATIONS=[
+  {name:"BLS Occupational Outlook Handbook",url:"https://www.bls.gov/ooh/",cat:"Labor / Gov",
+   why:"Primary source for occupational growth projections and job descriptions — drives demand signal scoring."},
+  {name:"O*NET OnLine",url:"https://www.onetonline.org/",cat:"Labor / Gov",
+   why:"Detailed skill and task profiles for 1,000+ occupations; cross-references directly to credential skill tags."},
+  {name:"Department of Labor WIOA Training Finder",url:"https://www.careeronestop.org/LocalHelp/EmploymentAndTraining/find-workforce-development.aspx",cat:"Workforce Board",
+   why:"Lists federally approved training providers eligible for WIOA funding — high-signal workforce credentials."},
+  {name:"CompTIA Certifications",url:"https://www.comptia.org/certifications",cat:"Certification Body",
+   why:"Vendor-neutral IT and cybersecurity certifications; consistently high employer demand across regions."},
+  {name:"AWS Training & Certification",url:"https://aws.amazon.com/certification/",cat:"Certification Body",
+   why:"Cloud certifications with the highest job-posting frequency of any vendor cert family."},
+  {name:"Microsoft Learn Certifications",url:"https://learn.microsoft.com/en-us/credentials/browse/",cat:"Certification Body",
+   why:"Full catalog of Azure, Security, Data, and AI certifications with structured exam paths."},
+  {name:"Google Cloud Certifications",url:"https://cloud.google.com/learn/certification",cat:"Certification Body",
+   why:"Covers AI/ML engineering, data engineering, and cloud architecture at associate and professional levels."},
+  {name:"Coursera Professional Certificates",url:"https://www.coursera.org/professional-certificates",cat:"Training Platform",
+   why:"Aggregates employer-designed certificates from Google, IBM, Meta, and others; ACE college-credit eligible."},
+  {name:"edX Professional Programs",url:"https://www.edx.org/professional-certificate",cat:"Training Platform",
+   why:"University-backed professional certificates; strong in AI, data science, and cybersecurity verticals."},
+  {name:"LinkedIn Learning Certificates",url:"https://www.linkedin.com/learning/topics/certificates",cat:"Training Platform",
+   why:"Directly linked to LinkedIn job market data; useful for tracking employer-endorsed learning paths."},
+  {name:"CISA — Cybersecurity Workforce Training",url:"https://www.cisa.gov/cybersecurity-training-exercises",cat:"Labor / Gov",
+   why:"Federal cybersecurity training catalog aligned to NICE Workforce Framework; free government-backed content."},
+  {name:"National Skills Coalition",url:"https://nationalskillscoalition.org/",cat:"Workforce Board",
+   why:"Policy research on industry-recognized credentials and stackable credentials; useful for signal validation."},
+  {name:"NVIDIA Deep Learning Institute",url:"https://www.nvidia.com/en-us/training/",cat:"Training Platform",
+   why:"Hands-on AI/ML workshops with verifiable digital badges; high demand in ML Engineer and AI Researcher roles."},
+  {name:"Salesforce Trailhead Credentials",url:"https://trailhead.salesforce.com/credentials",cat:"Certification Body",
+   why:"Covers CRM, AI, and data analytics; Salesforce-admin and developer credentials appear frequently in job listings."},
+  {name:"ISC2 Certifications",url:"https://www.isc2.org/certifications",cat:"Certification Body",
+   why:"Gold standard for cybersecurity professionals; CISSP and CC are among the most-cited credentials in security postings."},
+  {name:"PMI Certifications",url:"https://www.pmi.org/certifications",cat:"Certification Body",
+   why:"PMP and Agile credentials remain top requirements for tech project management and hybrid roles."},
+  {name:"SHRM Learning & Certification",url:"https://www.shrm.org/credentials",cat:"Certification Body",
+   why:"HR certifications relevant to workforce development and talent acquisition roles tied to emerging tech hiring."},
+  {name:"ACT WorkKeys",url:"https://www.act.org/content/act/en/products-and-services/workkeys-for-job-seekers.html",cat:"Industry Assoc.",
+   why:"National Career Readiness Certificate used by manufacturers and logistics employers; tied to automation roles."},
+  {name:"FANUC CNC / Robotics Education",url:"https://www.fanucamerica.com/education",cat:"Industry Assoc.",
+   why:"Industry-recognized credentials for CNC machining and robotics; tracked by manufacturing workforce boards."},
+  {name:"Credential Engine Registry",url:"https://credentialengine.org/credentials/",cat:"Other",
+   why:"Open registry of 1M+ credentials with machine-readable metadata — excellent bulk source for discovery."},
+];
+
+// Persist sources in localStorage (keyed list)
+const STORE_KEY='credIntelSources_v1';
+function loadSources(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||[];}catch{return[];}}
+function saveSources(arr){localStorage.setItem(STORE_KEY,JSON.stringify(arr));}
+let SOURCES=loadSources();
+
+// Pre-populate with BLS if empty
+if(!SOURCES.length){
+  SOURCES=[{name:"BLS Occupational Outlook Handbook",url:"https://www.bls.gov/ooh/",cat:"Labor / Gov",added:new Date().toISOString().slice(0,10)}];
+  saveSources(SOURCES);
+}
+
+function renderSources(){
+  const el=document.getElementById('srcList');
+  document.getElementById('srcCount').textContent=SOURCES.length;
+  if(!SOURCES.length){el.innerHTML='<div class="src-empty">No sources added yet.</div>';return;}
+  el.innerHTML=SOURCES.map((s,i)=>`
+    <div class="src-item">
+      <div class="src-item-info">
+        <div class="src-item-name">${s.name}</div>
+        <div class="src-item-url"><a href="${s.url}" target="_blank" rel="noopener" style="color:inherit">${s.url}</a></div>
+        <div class="src-item-tags">
+          <span class="src-chip ${s.cat.includes('Gov')||s.cat.includes('Labor')?'gov':''}">${s.cat}</span>
+          ${s.added===new Date().toISOString().slice(0,10)?'<span class="src-chip new">Added today</span>':''}
+        </div>
+      </div>
+      <div class="src-actions">
+        <button class="src-pull-one" onclick="pullOne(${i})">Pull now</button>
+        <button class="src-remove" onclick="removeSource(${i})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+function addSource(prefill){
+  const urlEl=document.getElementById('srcUrl');
+  const nameEl=document.getElementById('srcName');
+  const catEl=document.getElementById('srcCat');
+  const msg=document.getElementById('srcMsg');
+  const url=(prefill&&prefill.url)||urlEl.value.trim();
+  const name=(prefill&&prefill.name)||nameEl.value.trim()||url;
+  const cat=(prefill&&prefill.cat)||catEl.value;
+  if(!url){msg.textContent='⚠ Enter a URL first.';msg.style.color='var(--hi)';return;}
+  if(!/^https?:\/\//i.test(url)){msg.textContent='⚠ URL must start with http:// or https://';msg.style.color='var(--hi)';return;}
+  if(SOURCES.find(s=>s.url===url)){msg.textContent='Already in your source list.';msg.style.color='var(--gold)';return;}
+  SOURCES.push({name,url,cat,added:new Date().toISOString().slice(0,10)});
+  saveSources(SOURCES);
+  renderSources();renderRecs();
+  urlEl.value='';nameEl.value='';
+  msg.style.color='var(--hi2)';
+  msg.textContent=`✓ "${name}" added to active sources.`;
+  setTimeout(()=>msg.textContent='',3500);
+}
+
+function removeSource(i){
+  const removed=SOURCES.splice(i,1);
+  saveSources(SOURCES);renderSources();renderRecs();
+  const msg=document.getElementById('srcMsg');
+  msg.style.color='var(--mute)';
+  msg.textContent=`Removed "${removed[0].name}".`;
+  setTimeout(()=>msg.textContent='',2500);
+}
+
+function pullOne(i){
+  const s=SOURCES[i];
+  const msg=document.getElementById('srcMsg');
+  msg.style.color='var(--hi2)';
+  msg.textContent=`⟳ Pulling "${s.name}"…`;
+  // Simulate — replace with real targeted pull API call
+  setTimeout(()=>{
+    msg.textContent=`✓ Pull complete for "${s.name}". Refresh to see updates.`;
+    setTimeout(()=>msg.textContent='',4000);
+  },1800);
+}
+
+function renderRecs(){
+  const el=document.getElementById('recList');
+  el.innerHTML=RECOMMENDATIONS.map((r,i)=>{
+    const already=SOURCES.find(s=>s.url===r.url);
+    return`<div class="rec-item">
+      <div class="rec-info">
+        <div class="rec-name">${r.name}</div>
+        <div class="rec-url"><a href="${r.url}" target="_blank" rel="noopener" style="color:inherit">${r.url}</a></div>
+        <div class="rec-why">${r.why}</div>
+        <div style="margin-top:4px"><span class="src-chip ${r.cat.includes('Gov')||r.cat.includes('Labor')?'gov':''}">${r.cat}</span></div>
+      </div>
+      <button class="rec-add-btn${already?' added':''}" onclick="addFromRec(${i})" ${already?'disabled':''}>
+        ${already?'✓ Added':'+ Add'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function addFromRec(i){
+  const r=RECOMMENDATIONS[i];
+  addSource({name:r.name,url:r.url,cat:r.cat});
+}
+
+document.getElementById('recCount').textContent=RECOMMENDATIONS.length;
+renderSources();renderRecs();
+
+/* ── FAQ ── */
+const FAQS=[
+  {q:"What is this dashboard?",
+   a:"This is the Credential Intelligence Dashboard — a searchable, filterable index of emerging-tech workforce credentials (certifications, microcredentials, digital badges, and industry credentials). It's powered by an automated agent that crawls provider websites, extracts structured data, and scores each credential's demand signal against labor market indicators."},
+  {q:"What does the 'Pull Data NOW' button do?",
+   a:"It manually triggers the full data pipeline: the agent crawls all seed sources, checks whether any pages have changed (via content hashing), extracts new or updated records, classifies and tags them, and upserts results into the database. Use this whenever you want fresh data outside the normal schedule. The scheduler is currently paused, so this is the primary way to update the index."},
+  {q:"Why is the scheduler paused?",
+   a:"The automatic weekly crawl has been intentionally paused. All data refreshes are now triggered manually using 'Pull Data NOW'. This gives you full control over when the pipeline runs — useful while you're configuring the database, adjusting seed sources, or reviewing agent behavior before re-enabling automation."},
+  {q:"What do the demand signals (High / Medium / Low) mean?",
+   a:"The signal field rates how strongly aligned a credential is with current workforce demand. High = the related occupations appear frequently in job postings and have strong BLS growth projections. Medium = moderate posting volume or moderate projected growth. Low = limited posting activity or flat/declining occupational outlook. Signals are derived from external data (BLS projections, Lightcast/O*NET job-posting frequency) — they are not guesses."},
+  {q:"How is the demand signal calculated?",
+   a:"The agent cross-references each credential's related occupations (occ[] field) against three sources: (1) BLS Occupational Outlook projections for 10-year growth rate, (2) job-posting frequency for those occupations from Lightcast or O*NET data, and (3) industry growth tags. A credential whose occupations score high on all three is marked 'high'. The signal is recomputed each time a record is updated."},
+  {q:"What are the credential types?",
+   a:"Certification — a formal, typically exam-based credential from a recognized body (e.g. AWS, CompTIA, ISC2). Microcredential — a short, focused credential proving a narrow skill, often stackable. Digital Badge — a verifiable digital credential (usually via Credly or similar) tied to a specific competency. Certificate — a program-completion credential from a course or training provider. Industry Credential — an employer- or industry-association-issued credential tied to specific equipment or platforms (e.g. FANUC, Siemens)."},
+  {q:"What does the 'Updated' date on a card mean?",
+   a:"It's the ISO date the agent last detected a change on the credential's source page and re-extracted its data. It is not the date the credential was created. A recent updated date means the provider recently changed something (cost, requirements, format, etc.) and the record reflects those changes."},
+  {q:"What do the filters do?",
+   a:"Filters narrow the visible cards in real time. Industry — the tech domain the credential serves (AI, Cybersecurity, Robotics, etc.). Credential Type — the category of credential. Delivery Format — how the credential is earned (online exam, in-person, self-paced, etc.). Demand Signal — filter to only High, Medium, or Low demand credentials. Region — US-only vs. Global. Max Cost — slider that hides credentials above your chosen price. All filters stack: a card must pass every active filter to appear."},
+  {q:"What does the Search bar search?",
+   a:"It performs a live full-text search across credential name, organization, description, skill tags, related occupations, and industry. You do not need to match exactly — partial words work. It combines with all active sidebar filters, so you can, for example, search 'Python' while filtering to High demand only."},
+  {q:"What does the Sort dropdown do?",
+   a:"Recently updated — newest changed records first. Demand signal — High before Medium before Low, ties broken by recency. Cost low→high / high→low — sort by exam or program cost. Name A→Z — alphabetical."},
+  {q:"What does 'Free' mean on a card?",
+   a:"The credential's listed cost is $0. Some free credentials require paid membership to maintain (e.g. ISC2 CC has a free exam but an annual maintenance fee). Always check the provider's current page via 'View credential ↗' before assuming zero ongoing cost."},
+  {q:"What is the 'View credential ↗' link?",
+   a:"A direct link to the credential's official page on the provider's website, opened in a new tab. This is the canonical source for current pricing, requirements, exam registration, and renewal terms. The dashboard data is a snapshot; the provider page is always authoritative."},
+  {q:"Where is the data stored?",
+   a:"In a Supabase PostgreSQL database (free tier). Each record maps to the schema shown in the System Design doc. The dashboard's embedded data array is replaced by a weekly export from that database. Versioning is maintained both in Supabase (credential_history table) and as a GitHub repository storing each weekly JSON export as a dated commit."},
+  {q:"How do I re-enable the automatic weekly schedule?",
+   a:"In the System Design, change Stage 5 back to 'weekly schedule'. In your deployment, update the scheduler configuration (e.g. cron expression 0 6 * * 1 for Monday 6am) and set Pipeline status to Active. The 'Crawl cadence' label in the dashboard header will reflect this once the config is updated."},
+];
+
+function buildFAQ(){
+  const el=document.getElementById('faqGrid');
+  el.innerHTML=FAQS.map((f,i)=>`
+    <div class="faq-item">
+      <button class="faq-q" aria-expanded="false" onclick="toggleFAQ(${i},this)">
+        ${f.q}<span class="arr">▾</span>
+      </button>
+      <div class="faq-a" id="fa${i}">${f.a}</div>
+    </div>`).join('');
+}
+function toggleFAQ(i,btn){
+  const a=document.getElementById('fa'+i);
+  const open=a.classList.toggle('open');
+  btn.setAttribute('aria-expanded',open);
+}
+
+/* ── FAQ INLINE Q&A (keyword matcher) ── */
+function answerQuestion(){
+  const inp=document.getElementById('faqAskInput');
+  const box=document.getElementById('faqAnswerBox');
+  const q=inp.value.trim().toLowerCase();
+  if(!q)return;
+  // Try to find the best matching FAQ
+  let best=null,bestScore=0;
+  FAQS.forEach(f=>{
+    const words=q.split(/\s+/);
+    const haystack=(f.q+' '+f.a).toLowerCase();
+    const score=words.filter(w=>w.length>2&&haystack.includes(w)).length;
+    if(score>bestScore){bestScore=score;best=f;}
+  });
+  box.className='faq-answer-box visible';
+  if(best&&bestScore>0){
+    box.innerHTML=`<b style="color:var(--gold)">${best.q}</b><br><br>${best.a}`;
+  } else {
+    box.innerHTML=`No close match found in the FAQ. Try rephrasing, or check the <a href="#" onclick="return false" style="color:var(--gold)">FAQ entries above</a> for related topics.`;
+  }
+}
+document.getElementById('faqAskInput').addEventListener('keydown',e=>{if(e.key==='Enter')answerQuestion()});
+buildFAQ();
+</script>
+</body>
+</html>
